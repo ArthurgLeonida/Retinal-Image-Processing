@@ -36,26 +36,42 @@ def correct_shade(green_c):
 
 def blood_vessel_subtraction(green_shade_correct):
 
-    # img2 = scipy.ndimage.filters.gaussian_filter(green_shade_correct, 5)
+    img2 = scipy.ndimage.filters.gaussian_filter(green_shade_correct, 5)
     
-    #th = cv2.adaptiveThreshold(
-    #    img2,
-    #    255,
-    #    cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
-    #    cv2.THRESH_BINARY_INV,
-    #    105, # 105
-    #    2
-    #)
-    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (20, 20))
+    at = cv2.adaptiveThreshold(
+        img2,
+        255,
+        cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+        cv2.THRESH_BINARY_INV,
+        105, # 105
+        2
+    )
+    # kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (20, 20))
     # A 'blackhat_img' será uma imagem em tons de cinza onde os vasos
     # (que eram escuros) agora estão BRILHANTES.
-    blackhat_img = cv2.morphologyEx(green_shade_correct, cv2.MORPH_BLACKHAT, kernel)
-    ret, th = cv2.threshold(blackhat_img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    # blackhat_img = cv2.morphologyEx(green_shade_correct, cv2.MORPH_BLACKHAT, kernel)
+    # ret, th = cv2.threshold(blackhat_img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
     # ====================================================================================================== #
-    clean_kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
 
-    th = cv2.morphologyEx(th, cv2.MORPH_OPEN, clean_kernel, iterations=2)
-    th = cv2.morphologyEx(th, cv2.MORPH_CLOSE, clean_kernel, iterations=2)
+    """
+    image_float = img_as_float(green_shade_correct)
+    frangi_img = frangi(
+        image_float, 
+        sigmas=range(1, 12, 1),  # This range is good
+        black_ridges=True,
+        beta=0.1,                
+        gamma=0.01
+    )
+
+    output_max = frangi_img.max()
+    print(f"Frangi output max value: {output_max}")
+    # frangi_norm = frangi_img / np.max(frangi_img)
+    """
+    # ====================================================================================================== #
+    clean_kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (6, 6))
+
+    th = cv2.morphologyEx(at, cv2.MORPH_OPEN, clean_kernel, iterations=1)
+    th = cv2.morphologyEx(th, cv2.MORPH_CLOSE, clean_kernel, iterations=1)
     
     # PROFESSOR SUGERIU TESTAR ESSAS OPERAÇÕES
 
@@ -63,9 +79,11 @@ def blood_vessel_subtraction(green_shade_correct):
     # th = cv2.dilate(th, kernel, iterations=3)
 
     fig = plt.figure(figsize=(18,9))
-    plt.subplot(121),plt.imshow(green_shade_correct, cmap='gray'),plt.title('Enchanced image (clahe + shade corrected)')
+    plt.subplot(131),plt.imshow(green_shade_correct, cmap='gray'),plt.title('Enchanced image (clahe + shade corrected)')
     plt.xticks([]), plt.yticks([])
-    plt.subplot(122),plt.imshow(th, cmap='gray'),plt.title('Blood vessels segmented')
+    plt.subplot(132),plt.imshow(at, cmap='gray'),plt.title('adaptiveThreshold output')
+    plt.xticks([]), plt.yticks([])    
+    plt.subplot(133),plt.imshow(th, cmap='gray'),plt.title('Blood vessels segmented')
     plt.xticks([]), plt.yticks([])
     plt.show()
 
