@@ -91,8 +91,8 @@ def segment_vessels(enhanced_img,
     if post_blur_k > 0:
         vessel_enhanced = cv2.medianBlur(vessel_enhanced, post_blur_k)
     
-    # PASSO 5: Thresholding - Otsu
-    _, vessels_binary = cv2.threshold(vessel_enhanced, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    # PASSO 5: Thresholding - Otsu (RUIM)
+    # _, vessels_binary = cv2.threshold(vessel_enhanced, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
     
     # PASSO 6: Limpeza por componentes conexos
     num_labels, labels, stats, centroids = cv2.connectedComponentsWithStats(vessels_binary, connectivity=8)
@@ -119,7 +119,6 @@ def segment_vessels(enhanced_img,
     vessels_inverted = cv2.bitwise_not(vessels_final)
     
     return vessels_inverted, blackhat
-
 
 def segment_vessels_frangi(enhanced_img):
     """
@@ -195,7 +194,6 @@ def segment_vessels_frangi(enhanced_img):
         print("  pip install scikit-image")
         print("="*70 + "\n")
         return segment_vessels(enhanced_img)
-
 
 def segment_optic_disc(img_path):
     """
