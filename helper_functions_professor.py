@@ -43,7 +43,7 @@ def blood_vessel_subtraction(green_shade_correct):
         cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
         cv2.THRESH_BINARY_INV,
         105, # 105
-        1
+        2
     )
     # kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (20, 20))
     # A 'blackhat_img' será uma imagem em tons de cinza onde os vasos
@@ -69,15 +69,17 @@ def blood_vessel_subtraction(green_shade_correct):
     # ====================================================================================================== #
     clean_kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (2, 2))
 
-    # th = cv2.morphologyEx(at, cv2.MORPH_OPEN, clean_kernel, iterations=4)
-    # th = cv2.morphologyEx(th, cv2.MORPH_CLOSE, clean_kernel, iterations=4)
+
+    th = cv2.morphologyEx(at, cv2.MORPH_CLOSE, clean_kernel, iterations=2)
+    th = cv2.morphologyEx(th, cv2.MORPH_OPEN, clean_kernel, iterations=4)
     
-    image_float = img_as_float(at)
-    th = frangi(
-        image_float, 
-        sigmas=range(1, 10, 1),  # This range is good
-        black_ridges=False
-    )
+    
+    #image_float = img_as_float(at)
+    #th = frangi(
+    #    image_float, 
+    #    sigmas=range(1, 10, 1),  # This range is good
+    #    black_ridges=False
+    #)
 
     # PROFESSOR SUGERIU TESTAR ESSAS OPERAÇÕES
 
@@ -85,11 +87,11 @@ def blood_vessel_subtraction(green_shade_correct):
     # th = cv2.dilate(th, kernel, iterations=3)
 
     fig = plt.figure(figsize=(18,9))
-    plt.subplot(131),plt.imshow(green_shade_correct, cmap='gray'),plt.title('Enchanced image (clahe + shade corrected)')
+    plt.subplot(121),plt.imshow(green_shade_correct, cmap='gray'),plt.title('Corrected shade)')
     plt.xticks([]), plt.yticks([])
-    plt.subplot(132),plt.imshow(at, cmap='gray'),plt.title('adaptiveThreshold output')
-    plt.xticks([]), plt.yticks([])    
-    plt.subplot(133),plt.imshow(th, cmap='gray'),plt.title('Blood vessels segmented')
+    #plt.subplot(132),plt.imshow(at, cmap='gray'),plt.title('adaptiveThreshold output')
+    #plt.xticks([]), plt.yticks([])    
+    plt.subplot(122),plt.imshow(th, cmap='gray'),plt.title('Blood vessels segmented')
     plt.xticks([]), plt.yticks([])
     plt.show()
 
